@@ -1,4 +1,4 @@
-# Esplora: Unveiling a World of Open-Source Exploration and Collaboration!
+## Esplora: Unveiling a World of Open-Source Exploration and Collaboration!
 
 Step into the world of Esplora, where we embrace the spirit of open-source projects that invite exploration 🤓. Take a plunge into the list below and don't
 hesitate to express your appreciation with a ⭐️ if you find them truly valuable! What's more, we eagerly await your valuable contributions.
