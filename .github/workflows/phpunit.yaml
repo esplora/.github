@@ -1,0 +1,60 @@
+name: Tests
+
+on:
+  push:
+    paths:
+      - '.github/workflows/**'
+      - '**.php'
+      - 'src/**'
+      - 'tests/**'
+      - 'phpunit.xml'
+      - 'composer.json'
+      - 'composer.lock'
+
+  workflow_call:
+    inputs:
+      php:
+        default: '[ "8.2", "8.1" ]'
+        type: string
+      os:
+        default: '[ "ubuntu-latest", "windows-latest" ]'
+        type: string
+      dependency-version:
+        default: '[ "prefer-lowest", "prefer-stable" ]'
+        type: string
+
+jobs:
+  phpunit:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ${{ fromJSON(inputs.php)}}
+        os: ${{ fromJSON(inputs.os)}}
+        dependency-version: ${{ fromJSON(inputs.dependency-version)}}
+
+    name: P${{ matrix.php }} - ${{ matrix.os }} - ${{ matrix.dependency-version }}
+
+    steps:
+      - name: Checkout code 🛎️
+        uses: actions/checkout@v1
+
+      - name: Cache dependencies 🔧
+        uses: actions/cache@v1
+        with:
+          path: ~/.composer/cache/files
+          key: dependencies-php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
+
+      - name: Setup PHP 🔧
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo, redis
+          coverage: none
+          tools: composer:v2
+
+      - name: Install dependencies 🔧
+        run: |
+          composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction
+      - name: Execute tests (Unit and Feature tests) via PHPUnit 🧪
+        run: vendor/bin/phpunit
