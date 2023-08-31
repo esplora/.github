@@ -1,0 +1,58 @@
+name: Check & fix styling
+
+on:
+  push: # (or pull requests)
+    paths:
+      - '.github/workflows/**'
+      - '**.php'
+      - 'app/**'
+      - 'tests/**'
+      - 'phpunit.xml'
+      - 'composer.json'
+      - 'composer.lock'
+      - 'resources/js/**'
+      - 'resources/css/**'
+      - '.prettierrc.json'
+
+  workflow_call:
+    inputs:
+      php:
+        default: "8.2"
+        type: string
+      message:
+        default: Fix code styling
+        type: string
+
+jobs:
+  php-cs-fixer:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.head_ref }}
+
+      - name: Setup PHP 🔧
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ inputs.php }}
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
+          coverage: none
+          tools: composer:v2
+        env:
+          COMPOSER_TOKEN: ${{ secrets.TOKEN }}
+
+      - name: Install Dependencies 🔧
+        run: |
+          php -r "copy('https://raw.githubusercontent.com/esplora/.github/main/pint.json', 'pint.json');"
+          composer require --dev "laravel/pint"
+          composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
+
+      - name: Run Pint
+        run: vendor/bin/pint
+
+      - name: Commit changes
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: ${{ inputs.message }}
