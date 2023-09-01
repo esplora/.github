@@ -22,6 +22,15 @@ on:
       dependency-version:
         default: '[ "prefer-lowest", "prefer-stable" ]'
         type: string
+      laravel:
+        default: '[ "10.*" ]'
+        type: string
+      include-laravel:
+        default: '10.*'
+        type: string
+      include-testbench:
+        default: '8.*'
+        type: string
 
 jobs:
   phpunit:
@@ -31,9 +40,13 @@ jobs:
       matrix:
         php: ${{ fromJSON(inputs.php)}}
         os: ${{ fromJSON(inputs.os)}}
+        laravel: ${{ fromJSON(inputs.laravel)}}
         dependency-version: ${{ fromJSON(inputs.dependency-version)}}
+        include:
+          - laravel: ${{ inputs.include-laravel }}
+            testbench: ${{ inputs.include-testbench }}
 
-    name: P${{ matrix.php }} - ${{ matrix.os }} - ${{ matrix.dependency-version }}
+    name: P${{ matrix.php }} - ${{ matrix.os }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }}
 
     steps:
       - name: Checkout code 🛎️
@@ -43,7 +56,7 @@ jobs:
         uses: actions/cache@v3
         with:
           path: ~/.composer/cache/files
-          key: dependencies-php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
+          key: dependencies-laravel-${{ matrix.laravel }}-php-${{ matrix.php }}-composer-${{ hashFiles('composer.json') }}
 
       - name: Setup PHP 🔧
         uses: shivammathur/setup-php@v2
@@ -55,6 +68,8 @@ jobs:
 
       - name: Install dependencies 🔧
         run: |
+          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" --no-interaction --no-update
           composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction
+
       - name: Execute tests (Unit and Feature tests) via PHPUnit 🧪
         run: vendor/bin/phpunit
