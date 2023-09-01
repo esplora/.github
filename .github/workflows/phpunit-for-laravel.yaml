@@ -25,11 +25,14 @@ on:
       laravel:
         default: '[ "10.*" ]'
         type: string
-      include-laravel:
-        default: '10.*'
+      use-redis:
+        default: false
+        type: boolean
+      include:
+        default: '[{"laravel":"10.*", "testbench": "8.*"}]'
         type: string
-      include-testbench:
-        default: '8.*'
+      execute:
+        default: '[]'
         type: string
 
 jobs:
@@ -42,9 +45,9 @@ jobs:
         os: ${{ fromJSON(inputs.os)}}
         laravel: ${{ fromJSON(inputs.laravel)}}
         dependency-version: ${{ fromJSON(inputs.dependency-version)}}
-        include:
-          - laravel: ${{ inputs.include-laravel }}
-            testbench: ${{ inputs.include-testbench }}
+        include: ${{ fromJSON(inputs.include)}}
+        exclude: ${{ fromJSON(inputs.execute)}}
+
 
     name: P${{ matrix.php }} - ${{ matrix.os }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }}
 
@@ -65,6 +68,12 @@ jobs:
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick, fileinfo, redis
           coverage: none
           tools: composer:v2
+
+      - name: Start Redis
+        if: ${{ inputs.use-redis }}
+        uses: supercharge/redis-github-action@1.2.0
+        with:
+          redis-version: ${{ matrix.redis-version }}
 
       - name: Install dependencies 🔧
         run: |
