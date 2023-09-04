@@ -22,6 +22,11 @@ on:
       message:
         default: Fix code styling
         type: string
+      pint:
+        default: ^1.2
+        type: string
+
+
 
 jobs:
   php-cs-fixer:
@@ -46,7 +51,7 @@ jobs:
       - name: Install Dependencies 🔧
         run: |
           php -r "copy('https://raw.githubusercontent.com/esplora/.github/main/pint.json', 'pint.json');"
-          composer require --dev "laravel/pint"
+          composer require --dev "laravel/pint:${{ inputs.pint }}"
           composer install -q --no-ansi --no-interaction --no-scripts --no-progress --prefer-dist
 
       - name: Run Pint
