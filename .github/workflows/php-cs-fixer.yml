@@ -6,6 +6,7 @@ on:
       - '.github/workflows/**'
       - '**.php'
       - 'app/**'
+      - 'src/**'
       - 'tests/**'
       - 'phpunit.xml'
       - 'composer.json'
