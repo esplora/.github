@@ -23,10 +23,8 @@ on:
         default: Fix code styling
         type: string
       pint:
-        default: ^1.2
+        default: ^1.17
         type: string
-
-
 
 jobs:
   php-cs-fixer:
@@ -34,7 +32,7 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.head_ref }}
 
