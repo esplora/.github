@@ -34,6 +34,9 @@ on:
       execute:
         default: '[]'
         type: string
+      install-tools:
+        default: '[]'
+        type: string
 
 jobs:
   phpunit:
@@ -47,7 +50,6 @@ jobs:
         dependency-version: ${{ fromJSON(inputs.dependency-version)}}
         include: ${{ fromJSON(inputs.include)}}
         exclude: ${{ fromJSON(inputs.execute)}}
-
 
     name: P${{ matrix.php }} - ${{ matrix.os }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }}
 
@@ -74,6 +76,19 @@ jobs:
         uses: supercharge/redis-github-action@1.2.0
         with:
           redis-version: ${{ matrix.redis-version }}
+
+      - name: Install tools 🔧
+        run: |
+          echo "${{ inputs.install-tools }}" | jq -r '.[]' | while read -r tool; do
+            if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
+              sudo apt-get update
+              sudo apt-get install -y "$tool"
+            elif [ "${{ matrix.os }}" == "windows-latest" ]; then
+              choco install "$tool" -y
+            elif [ "${{ matrix.os }}" == "macos-latest" ]; then
+              brew install "$tool"
+            fi
+          done
 
       - name: Install dependencies 🔧
         run: |
