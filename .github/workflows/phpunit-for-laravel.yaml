@@ -14,16 +14,16 @@ on:
   workflow_call:
     inputs:
       php:
-        default: '[ "8.3", "8.2", "8.1" ]'
+        default: '["8.3", "8.2", "8.1"]'
         type: string
       os:
-        default: '[ "ubuntu-latest", "windows-latest" ]'
+        default: '["ubuntu-latest", "windows-latest"]'
         type: string
       dependency-version:
-        default: '[ "prefer-lowest", "prefer-stable" ]'
+        default: '["prefer-lowest", "prefer-stable"]'
         type: string
       laravel:
-        default: '[ "10.*" ]'
+        default: '["10.*"]'
         type: string
       use-redis:
         default: false
@@ -44,12 +44,12 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        php: ${{ fromJSON(inputs.php)}}
-        os: ${{ fromJSON(inputs.os)}}
-        laravel: ${{ fromJSON(inputs.laravel)}}
-        dependency-version: ${{ fromJSON(inputs.dependency-version)}}
-        include: ${{ fromJSON(inputs.include)}}
-        exclude: ${{ fromJSON(inputs.execute)}}
+        php: ${{ fromJSON(inputs.php) }}
+        os: ${{ fromJSON(inputs.os) }}
+        laravel: ${{ fromJSON(inputs.laravel) }}
+        dependency-version: ${{ fromJSON(inputs.dependency-version) }}
+        include: ${{ fromJSON(inputs.include) }}
+        exclude: ${{ fromJSON(inputs.execute) }}
 
     name: P${{ matrix.php }} - ${{ matrix.os }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }}
 
@@ -80,12 +80,12 @@ jobs:
       - name: Install tools 🔧
         run: |
           for tool in ${{ fromJSON(inputs.install-tools) }}; do
-            if [ "${{ matrix.os }}" == "ubuntu-latest" ]; then
+            if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
               sudo apt-get update
               sudo apt-get install -y "$tool"
-            elif [ "${{ matrix.os }}" == "windows-latest" ]; then
+            elif [[ "${{ matrix.os }}" == "windows-latest" ]]; then
               choco install "$tool" -y
-            elif [ "${{ matrix.os }}" == "macos-latest" ]; then
+            elif [[ "${{ matrix.os }}" == "macos-latest" ]]; then
               brew install "$tool"
             fi
           done
